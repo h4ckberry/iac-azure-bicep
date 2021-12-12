@@ -7,8 +7,7 @@ param clusterName string
 @description('for AKS Cluster Managed Identity Name')
 param managedIdName string = guid(clusterName)
 
-// 1. VNet & Subnet の作成
-
+// VNet & Subnet の作成
 @description('for AKS Cluster Name & VNET Name Prefix')
 param VNetAddressPrefix string = '10.10.0.0/16'
 
@@ -96,4 +95,41 @@ resource aks 'Microsoft.ContainerService/managedClusters@2021-08-01' = {
       }
     ]
   }
+}
+
+// ACRの作成
+@minLength(5)
+@maxLength(50)
+@description('Provide a globally unique name of your Azure Container Registry')
+param acrName string
+
+@description('Provide a tier of your Azure Container Registry.')
+param acrSku string = 'Basic'
+
+resource acr 'Microsoft.ContainerRegistry/registries@2021-06-01-preview' = {
+  name: acrName
+  location: location
+  sku: {
+    name: acrSku
+  }
+  properties: {
+    adminUserEnabled: true
+  }
+}
+
+//https://docs.microsoft.com/ja-jp/azure/role-based-access-control/built-in-roles
+var roleAcrPull = '7f951dda-4ed3-4680-a7ca-43fe172d538d'
+
+resource assignAcrPullToAks 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(resourceGroup().id, acrName, aks.id, 'AssignAcrPullToAks')
+  scope: acr
+  properties: {
+    description: 'Assign AcrPull role to AKS'
+    principalId: aks.properties.identityProfile.kubeletidentity.objectId //https://github.com/Azure/bicep/discussions/3181
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/${roleAcrPull}'
+  }
+  dependsOn: [
+    aks
+  ]
 }
