@@ -4,7 +4,7 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 #Exclude input parameters
-input.parameters.json
+*.parameters.json
 
 # User-specific files
 *.rsuser
