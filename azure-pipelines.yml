@@ -18,5 +18,5 @@ jobs:
         az deployment group create \
           --name $(Build.BuildNumber) \
           --resource-group $(ResourceGroupName) \
-          --template-file deploy/main.bicep \
-          --parameters environmentType=$(EnvironmentType) deployToyManualsStorageAccount=$(DeployToyManualsStorageAccount)
+          --template-file db-postgres.bicep \
+          --parameters dbName=$(dbName) adminUser=$(adminUser) adminPassword=$(adminPassword) allowIp=$(AllowIp)
