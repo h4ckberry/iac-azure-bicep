@@ -1,0 +1,22 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger: none
+pool:
+  vmImage: ubuntu-latest
+jobs:
+- job: 
+  steps:
+  - task: AzureCLI@2
+    inputs:
+      azureSubscription: $(ServiceConnectionName)
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: >-
+        az deployment group create \
+          --name $(Build.BuildNumber) \
+          --resource-group $(ResourceGroupName) \
+          --template-file db-postgres.bicep \
+          --parameters dbName=$(dbName) adminUser=$(adminUser) adminPassword=$(adminPassword) allowIp=$(AllowIp)
