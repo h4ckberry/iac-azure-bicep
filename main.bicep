@@ -1,7 +1,7 @@
 targetScope = 'subscription'
 param location string = 'eastasia'
-param resourcePrefix string = 'flutter'
-param environment string = 'stg'
+param resourcePrefix string = 'todo'
+param environment string = 'dev'
 
 param subscriptionId string
 param kvResourceGroup string
@@ -29,6 +29,6 @@ module ModuleStaticWebsite 'sw.bicep' = {
     resourcePrefix: resourcePrefix
     repositoryUrl: repositoryUrl
     repositoryBranch: repositoryBranch
-    repositoryToken: kv.getSecret('GithubPAT')
+    repositoryToken: kv.getSecret('personal-access-tokens')
   }
 }

@@ -1,17 +1,16 @@
-@description('The Azure region into which the resources should be deployed.')
+@description('Resource Deployment Location.')
 param location string = resourceGroup().location
 
-@description('for AKS Cluster Name & VNET Name Prefix')
+@description('AKS Cluster Name')
 param clusterName string
 
-@description('for AKS Cluster Managed Identity Name')
+@description('AKS Cluster Managed Identity Name')
 param managedIdName string = guid(clusterName)
 
-// VNet & Subnet の作成
-@description('for AKS Cluster Name & VNET Name Prefix')
+@description('VNET Name Prefix')
 param VNetAddressPrefix string = '10.10.0.0/16'
 
-@description('for AKS Cluster Name & VNET Name Prefix')
+@description('SUBNET Name Prefix')
 param SubnetAddressPrefix string = '10.10.1.0/24'
 
 resource AKSVNet 'Microsoft.Network/virtualNetworks@2021-03-01' = {
@@ -34,7 +33,6 @@ resource AKSVNet 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   }
 }
 
-// scope プロパティでリソースを参照するには、リソースのシンボリック名を指定する必要がある
 resource AKSSubNet 'Microsoft.Network/virtualNetworks/subnets@2021-03-01' existing = {
   parent: AKSVNet // https://githubmemory.com/repo/Azure/bicep/issues/1972
   name: 'sn-${clusterName}'
@@ -87,9 +85,9 @@ resource aks 'Microsoft.ContainerService/managedClusters@2021-08-01' = {
     enableRBAC: true
     agentPoolProfiles: [
       {
-        name: 'agentpool1'
+        name: 'agentpool'
         count: 2
-        vmSize: 'standard_d2s_v3'
+        vmSize: 'Standard_B2s'
         mode: 'System'
         vnetSubnetID: AKSSubNet.id
       }
